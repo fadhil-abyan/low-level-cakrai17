@@ -17,9 +17,10 @@
 unsigned long millisEncoder = 0;
 
 // Membuat objek motor, dengan parameter pin ENA, FWD, REV
-Motor motorF(41, 40, 39);
-Motor motorL(16, 10, 11);
-Motor motorR(1, 2, 42);
+Motor motorF(41, 40, 39, 0, 1); // uses channels 0 and 1
+Motor motorL(16, 10, 11, 2, 3); // uses channels 2 and 3
+Motor motorR(1, 2, 42, 4, 5);   // uses channels 4 and 5
+
 //Moving Average Object
 MovingAverage avgVel1(10);
 MovingAverage avgVel2(100);
@@ -115,29 +116,22 @@ void loop(){
 
   if (millis() - millisEncoder >= TS_ENCODER) {
     millisEncoder = millis(); 
-    
-    motor1.update(encoderPos1);
-    //motor2.update(encoderPos2);
-    //motor3.update(encoderPos3);
-
-
-    //Moving Average Calculations
-    //Motor1
-    float currentSpeed1 = avgVel1.movingAverage(motor1.getAngularVel());
-    //Motor2
-    //float currentSpeed2 = avgVel2.movingAverage(motor2.getAngularVel());
-    //Motor3
-    //float currentSpeed3 = avgVel3.movingAverage(motor3.getAngularVel());
-  
-    // Hitung output PWM dari PID
-    // Input: posisi saat ini (rad), target (rad), gain (1.0f)
-    float pwm1 = tespid1.getOutput_velControl(currentSpeed1, targetSpeed, 24.0f);
-    //float pwm2 = tespid2.getOutput_velControl(currentSpeed1, targetSpeed, 24.0f);
-    //float pwm3 = tespid3.getOutput_velControl(currentSpeed1, targetSpeed, 24.0f);
    
-    motorF.speed(pwm1); 
-    //motorL.speed(pwm2); 
-    //motorR.speed(pwm3); 
+    motor1.update(encoderPos1);
+    motor2.update(encoderPos2);
+    motor3.update(encoderPos3);
+
+    float currentSpeed1 = avgVel1.movingAverage(motor1.getAngularVel());
+    float currentSpeed2 = avgVel2.movingAverage(motor2.getAngularVel());
+    float currentSpeed3 = avgVel3.movingAverage(motor3.getAngularVel());
+
+    float pwm1 = tespid1.getOutput_velControl(currentSpeed1, targetSpeed, 24.0f);
+    float pwm2 = tespid2.getOutput_velControl(currentSpeed2, targetSpeed, 24.0f);
+    float pwm3 = tespid3.getOutput_velControl(currentSpeed3, targetSpeed, 24.0f);
+
+    motorF.speed(pwm1);
+    motorL.speed(pwm2);
+    motorR.speed(pwm3);
 
     Serial.print("Target: ");
     Serial.print(targetSpeed);
