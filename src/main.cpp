@@ -1,7 +1,12 @@
+#include <Arduino.h>
 #include <Ps3Controller.h>
 
 int player = 0;
 int battery = 0;
+unsigned long now = 0;
+unsigned long tadi = 0;
+#define JARAK_BACA 10 //satuan millisecond 
+
 
 void notify()
 {
@@ -205,37 +210,34 @@ void setup()
     Serial.println("Ready.");
 }
 
+
+
 void loop()
 {
     if(!Ps3.isConnected())
         return;
+    now = millis();
+    if ((now - tadi) > JARAK_BACA){
+        tadi = now;
 
-    // //-------------------- Player LEDs -------------------
-    // Serial.print("Setting LEDs to player "); Serial.println(player, DEC);
-    // Ps3.setPlayer(player);
+         //------ Digital cross/square/triangle/circle buttons ------
+        if( Ps3.data.button.cross && Ps3.data.button.down )
+            Serial.println("Pressing both the down and cross buttons");
+        if( Ps3.data.button.square && Ps3.data.button.left )
+            Serial.println("Pressing both the square and left buttons");
+        if( Ps3.data.button.triangle && Ps3.data.button.up )
+            Serial.println("Pressing both the triangle and up buttons");
+        if( Ps3.data.button.circle && Ps3.data.button.right )
+            Serial.println("Pressing both the circle and right buttons");
 
-    // player += 1;
-    // if(player > 10) player = 0;
+        if( Ps3.data.button.l1 && Ps3.data.button.r1 )
+            Serial.println("Pressing both the left and right bumper buttons");
+        if( Ps3.data.button.l2 && Ps3.data.button.r2 )
+            Serial.println("Pressing both the left and right trigger buttons");
+        if( Ps3.data.button.l3 && Ps3.data.button.r3 )
+            Serial.println("Pressing both the left and right stick buttons");
+        if( Ps3.data.button.select && Ps3.data.button.start )
+            Serial.println("Pressing both the select and start buttons");
 
-
-    //------ Digital cross/square/triangle/circle buttons ------
-    if( Ps3.data.button.cross && Ps3.data.button.down )
-        Serial.println("Pressing both the down and cross buttons");
-    if( Ps3.data.button.square && Ps3.data.button.left )
-        Serial.println("Pressing both the square and left buttons");
-    if( Ps3.data.button.triangle && Ps3.data.button.up )
-        Serial.println("Pressing both the triangle and up buttons");
-    if( Ps3.data.button.circle && Ps3.data.button.right )
-        Serial.println("Pressing both the circle and right buttons");
-
-    if( Ps3.data.button.l1 && Ps3.data.button.r1 )
-        Serial.println("Pressing both the left and right bumper buttons");
-    if( Ps3.data.button.l2 && Ps3.data.button.r2 )
-        Serial.println("Pressing both the left and right trigger buttons");
-    if( Ps3.data.button.l3 && Ps3.data.button.r3 )
-        Serial.println("Pressing both the left and right stick buttons");
-    if( Ps3.data.button.select && Ps3.data.button.start )
-        Serial.println("Pressing both the select and start buttons");
-
-    delay(2000);
+    }
 }
